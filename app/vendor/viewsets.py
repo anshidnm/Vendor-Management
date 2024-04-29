@@ -7,9 +7,8 @@ from .serializers import VendorSerializer, VendorPerformanceSerializer
 
 
 class VendorViewset(ModelViewSet):
-    queryset = Vendor.objects.filter(is_active=True)
+    queryset = Vendor.objects.order_by("-id")
     serializer_class = VendorSerializer
-    http_method_names = ["get", "post", "put", "delete"]
 
     @action(methods=["GET"], detail=True, serializer_class=VendorPerformanceSerializer)
     def performance(self, request, *args, **kwargs):
