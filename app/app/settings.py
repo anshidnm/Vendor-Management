@@ -39,7 +39,7 @@ DJANGO_APPS = [
     "django.contrib.staticfiles",
 ]
 
-CUSTOM_APPS = ["core", "vendor"]
+CUSTOM_APPS = ["core", "vendor", "order"]
 
 EXTERNAL_APPS = ["rest_framework", "drf_spectacular"]
 
@@ -81,8 +81,12 @@ WSGI_APPLICATION = "app.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "vendor",
+        "HOST": "localhost",
+        "PORT": 5432,
+        "PASSWORD": "1234",
+        "USER": "postgres",
     }
 }
 
@@ -152,4 +156,5 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Vendor Management",
     "DESCRIPTION": "Vendor management system",
     "VERSION": "1.0.0",
+    "SCHEMA_PATH_PREFIX": "/api/",
 }

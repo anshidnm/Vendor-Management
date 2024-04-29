@@ -8,3 +8,4 @@ from .models import Vendor
 def generate_vender_code(sender, instance, created, **kwargs):
     if created:
         instance.vendor_code = f"VND-MGT-{str(instance.pk).zfill(6)}"
+        instance.save()

@@ -5,5 +5,6 @@ from .serializers import VendorSerializer
 
 
 class VendorViewset(ModelViewSet):
-    queryset = Vendor.objects.all()
+    queryset = Vendor.objects.filter(is_active=True)
     serializer_class = VendorSerializer
+    http_method_names = ["get", "post", "put", "delete"]
