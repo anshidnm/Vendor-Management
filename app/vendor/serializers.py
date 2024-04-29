@@ -18,3 +18,18 @@ class VendorSerializer(serializers.ModelSerializer):
             "average_response_time",
             "fulfillment_rate",
         ]
+
+
+class VendorPerformanceSerializer(serializers.ModelSerializer):
+    """
+    Serializer for listing vendor permonace
+    """
+
+    class Meta:
+        model = Vendor
+        fields = [
+            "on_time_delivery_rate",
+            "quality_rating_avg",
+            "average_response_time",
+            "fulfillment_rate",
+        ]
