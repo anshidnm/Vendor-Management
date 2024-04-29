@@ -48,7 +48,8 @@ class Calculation:
     def calculate_quality_rating(self):
         rating_data = self.get_aggregated_data()
         average_rating = (
-            rating_data["total_quality_rating"] / rating_data["total_completed_po"]
+            none_to_zero(rating_data["total_quality_rating"])
+            / none_to_zero(rating_data["total_completed_po"])
             if rating_data["total_completed_po"]
             else 0
         )
@@ -58,7 +59,8 @@ class Calculation:
     def calculate_fulfillment_rate(self):
         rating_data = self.get_aggregated_data()
         average_rating = (
-            rating_data["total_completed_po"] / rating_data["total_po"]
+            none_to_zero(rating_data["total_completed_po"])
+            / none_to_zero(rating_data["total_po"])
             if rating_data["total_po"]
             else 0
         )
@@ -80,7 +82,9 @@ class Calculation:
             .aggregate(total_seconds=Sum("response_time"), total_po=Count("*"))
         )
         average_time = (
-            data["total_seconds"] / data["total_po"] if data["total_po"] else 0
+            none_to_zero(data["total_seconds"]) / none_to_zero(data["total_po"])
+            if data["total_po"]
+            else 0
         )
         average_minutes = average_time / 60
         self._vendor.average_response_time = average_minutes
