@@ -1,6 +1,8 @@
 from core.utils import none_to_zero
+from datetime import datetime
 from django.db.models import Q, Sum, Count, F, ExpressionWrapper, FloatField
 from django.db.models.functions import Extract
+from vendor.models import PerformanceHistory
 
 from .models import PurchaseOrder
 
@@ -17,12 +19,22 @@ class Calculation:
         self._vendor = order.vendor
 
     def _is_status_updated(self):
+        """
+        Check order status updated or not
+        """
         return self._order.status != self._data["status"]
 
     def _is_quality_provided(self):
+        """
+        Check quality rating provided or not
+        """
         return self._order.quality_rating != self._data["quality_rating"]
 
     def get_aggregated_data(self):
+        """
+        Return aggregated data of purchase orders of a
+        specific vendor to caluculate vendor perfomance
+        """
         rating_data = PurchaseOrder.objects.filter(vendor=self._vendor).aggregate(
             on_time_count=Count(
                 "id",
@@ -35,6 +47,9 @@ class Calculation:
         return rating_data
 
     def calculate_on_time_delivery(self):
+        """
+        Calculate on time delivery rate of the vendor
+        """
         rating_data = self.get_aggregated_data()
         average_rating = (
             none_to_zero(rating_data["on_time_count"])
@@ -44,8 +59,13 @@ class Calculation:
         )
         self._vendor.on_time_delivery_rate = average_rating
         self._vendor.save()
+        self._create_perfomance_history()
 
     def calculate_quality_rating(self):
+        """
+        Calculate quality rate of the vendor
+        """
+
         rating_data = self.get_aggregated_data()
         average_rating = (
             none_to_zero(rating_data["total_quality_rating"])
@@ -55,8 +75,13 @@ class Calculation:
         )
         self._vendor.quality_rating_avg = average_rating
         self._vendor.save()
+        self._create_perfomance_history()
 
     def calculate_fulfillment_rate(self):
+        """
+        Calculate fullfillment rate of the vendor
+        """
+
         rating_data = self.get_aggregated_data()
         average_rating = (
             none_to_zero(rating_data["total_completed_po"])
@@ -66,8 +91,13 @@ class Calculation:
         )
         self._vendor.fulfillment_rate = average_rating
         self._vendor.save()
+        self._create_perfomance_history()
 
     def calculate_response_time(self):
+        """
+        Calculate response time of the vendor
+        """
+
         data = (
             PurchaseOrder.objects.filter(
                 vendor=self._vendor, acknowledgment_date__isnull=False
@@ -89,10 +119,28 @@ class Calculation:
         average_minutes = average_time / 60
         self._vendor.average_response_time = average_minutes
         self._vendor.save()
+        self._create_perfomance_history()
 
     def execute(self):
+        """
+        Execute calculations on order updates
+        """
         if self._is_status_updated() and self._data["status"] == "completed":
             self.calculate_on_time_delivery()
             self.calculate_fulfillment_rate()
         if self._is_quality_provided():
             self.calculate_quality_rating()
+
+    def _create_perfomance_history(self):
+        """
+        Create an entry to PerformanceHistory model
+        with current datetime and perfomance
+        """
+        PerformanceHistory.objects.create(
+            vendor=self._vendor,
+            date=datetime.now(),
+            on_time_delivery_rate=self._vendor.on_time_delivery_rate,
+            quality_rating_avg=self._vendor.quality_rating_avg,
+            average_response_time=self._vendor.average_response_time,
+            fulfillment_rate=self._vendor.fulfillment_rate,
+        )
