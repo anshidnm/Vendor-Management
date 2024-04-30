@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.db import transaction
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
@@ -26,8 +27,11 @@ class OrderViewset(ModelViewSet):
     @action(methods=["PATCH"], detail=True, serializer_class=None)
     def acknowledge(self, request, *args, **kwargs):
         obj = self.get_object()
-        if not obj.acknowledgment_date:
-            obj.acknowledgment_date = datetime.now()
-            obj.save()
+        if obj.acknowledgment_date:
+            return Response(
+                {"error": "Already acknowleged"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        obj.acknowledgment_date = datetime.now()
+        obj.save()
         Calculation(obj).calculate_response_time()
         return Response({"status": True})
