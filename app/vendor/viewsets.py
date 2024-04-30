@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -25,6 +26,10 @@ class VendorViewset(ModelViewSet):
 class VendorHistoryViewset(mixins.ListModelMixin, GenericViewSet):
     queryset = PerformanceHistory.objects.order_by("-id")
     serializer_class = VendorPerformanceHistorySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = {
+        "date": ["exact", "date__gte", "date__lte", "date__range", "gte", "lte"]
+    }
 
     def get_queryset(self):
         vendor = Vendor.objects.get(id=self.kwargs["vendor_id"])

@@ -12,6 +12,7 @@ class VendorSerializer(serializers.ModelSerializer):
         model = Vendor
         fields = "__all__"
         read_only_fields = [
+            "is_active",
             "vendor_code",
             "on_time_delivery_rate",
             "quality_rating_avg",

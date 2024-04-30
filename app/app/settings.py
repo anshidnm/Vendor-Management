@@ -41,7 +41,7 @@ DJANGO_APPS = [
 
 CUSTOM_APPS = ["core", "vendor", "order"]
 
-EXTERNAL_APPS = ["rest_framework", "drf_spectacular"]
+EXTERNAL_APPS = ["rest_framework", "drf_spectacular", "django_filters"]
 
 INSTALLED_APPS = DJANGO_APPS + CUSTOM_APPS + EXTERNAL_APPS
 

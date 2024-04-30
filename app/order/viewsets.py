@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.db import transaction
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -13,6 +14,8 @@ from .serializers import OrderSerializer
 class OrderViewset(ModelViewSet):
     queryset = PurchaseOrder.objects.select_related("vendor").order_by("-id")
     serializer_class = OrderSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["vendor_id"]
 
     def update(self, request, *args, **kwargs):
         try:
