@@ -8,9 +8,11 @@ from rest_framework.viewsets import ModelViewSet
 
 from .calcualtions import Calculation
 from .models import PurchaseOrder
+from .schema import Documentaion
 from .serializers import OrderSerializer
 
 
+@Documentaion.ORDER
 class OrderViewset(ModelViewSet):
     queryset = PurchaseOrder.objects.select_related("vendor").order_by("-id")
     serializer_class = OrderSerializer
@@ -27,7 +29,7 @@ class OrderViewset(ModelViewSet):
         except Exception as e:
             return Response({"error": str(e)})
 
-    @action(methods=["PATCH"], detail=True, serializer_class=None)
+    @action(methods=["PATCH"], detail=True)
     def acknowledge(self, request, *args, **kwargs):
         obj = self.get_object()
         if obj.acknowledgment_date:

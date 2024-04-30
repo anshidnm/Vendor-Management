@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 
 from .models import Vendor, PerformanceHistory
+from .schema import Documentaion
 from .serializers import (
     VendorSerializer,
     VendorPerformanceSerializer,
@@ -12,6 +13,7 @@ from .serializers import (
 )
 
 
+@Documentaion.VENDOR
 class VendorViewset(ModelViewSet):
     queryset = Vendor.objects.order_by("-id")
     serializer_class = VendorSerializer
@@ -23,6 +25,7 @@ class VendorViewset(ModelViewSet):
         return Response(ser.data)
 
 
+@Documentaion.HISTORY
 class VendorHistoryViewset(mixins.ListModelMixin, GenericViewSet):
     queryset = PerformanceHistory.objects.order_by("-id")
     serializer_class = VendorPerformanceHistorySerializer
